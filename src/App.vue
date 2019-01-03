@@ -1,17 +1,250 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="columns">
+    <!-- Side Menu -->
+    <div class="column is-2">
+      <aside class="menu">
+        <p class="menu-label">
+          Workspace 
+        </p>
+
+        <!-- Options Buttons -->
+        <div class="buttons has-text-centered">
+          <button class="button" @click="openQueryModal()" v-tooltip="{ content: 'Add Query', placement: 'bottom-end'}">
+            <span class="icon is-small">
+               <i class="fas fa-plus"></i>
+            </span>
+          </button>
+          <button class="button" @click="openWorkspaceModal()" v-tooltip="{ content: 'Add Workspace', placement: 'bottom-end'}">
+            <span class="icon is-small">
+               <i class="fas fa-folder-plus"></i>
+            </span>
+          </button>
+          <button class="button" v-tooltip="{ content: 'Delete Workspace', placement: 'bottom-end'}">
+            <span class="icon is-small">
+               <i class="fas fa-trash"></i>
+            </span>
+          </button>
+        </div>
+
+        <!-- Dropdown -->
+        <div class="dropdown" :class="{'is-active': menu_options.workspace_dropdown}" @click="toggleDropdown()">
+          <div class="dropdown-trigger">
+            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+              <span>{{workspaces[selected_wokspace].name}}</span>
+              <span class="icon is-small">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+              <a v-for="(workspace, index) in workspaces" :key="workspace.id" class="dropdown-item" @click="changeWorkspace(index)">
+                {{workspace.name}}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <p class="menu-label cursor-point" @click="toggleQueries()">
+          Query List
+          <i class="fas fa-minus is-pulled-right" v-if="menu_options.query_list_menu"></i>
+          <i class="fas fa-plus is-pulled-right" v-else></i>
+        </p>
+        <ul class="menu-list" v-show="menu_options.query_list_menu">
+          <li v-for="(query, index) in workspaces[selected_wokspace].queries" :key="query.id" @click="changeQuery(index)">
+            <a :class="{'is-active': query.id === workspaces[selected_wokspace].queries[selected_query].id}">{{query.name}}</a>
+          </li>
+        </ul>
+        <hr>
+        <p class="menu-label cursor-point" @click="toggleFrequent()">
+          Frequently Used
+          <i class="fas fa-minus is-pulled-right" v-if="menu_options.frequently_used_menu"></i>
+          <i class="fas fa-plus is-pulled-right" v-else></i>
+        </p>
+        <ul class="menu-list" v-show="menu_options.frequently_used_menu">
+          <li><a>Payments</a></li>
+          <li><a>Transfers</a></li>
+          <li><a>Balance</a></li>
+        </ul>
+        <hr>
+       <p class="menu-label cursor-point" @click="toggleOptions()">
+          Options
+          <i class="fas fa-minus is-pulled-right" v-if="menu_options.options_menu"></i>
+          <i class="fas fa-plus is-pulled-right" v-else></i>
+        </p>
+        <ul class="menu-list"  v-show="menu_options.options_menu">
+          <li><a><i class="fas fa-cog"></i> Settings</a></li>
+          <li><a><i class="far fa-comment"></i> Report a bug</a></li>
+          <li><a><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </aside>
+    </div>
+
+    <!-- Editor -->
+    <div class="column">
+      <code-editor :query='workspaces[selected_wokspace].queries[selected_query]' @save-code="updateCode"/>
+    </div>
+
+    </div>
+
+    <!-- Add Workspace Modal -->
+    <div class="modal" :class="{'is-active': menu_options.workspace_modal}">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <section class="modal-card-body">
+          <div class="field">
+            <p class="control has-icons-left">
+              <input class="input" type="text" placeholder="Name">
+              <span class="icon is-small is-left">
+                <i class="fas fa-pen"></i>
+              </span>
+            </p>
+          </div>
+          <div class="buttons">
+            <button class="button is-success">Add Workspace</button>
+            <button class="button" @click="closeWorkspaceModal()">Cancel</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Add Query Modal -->
+    <div class="modal" :class="{'is-active': menu_options.query_modal}">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <section class="modal-card-body">
+          <div class="field">
+            <p class="control has-icons-left">
+              <input class="input" type="text" placeholder="Name">
+              <span class="icon is-small is-left">
+                <i class="fas fa-pen"></i>
+              </span>
+            </p>
+          </div>
+          <div class="buttons">
+            <button class="button is-success">Add Query</button>
+            <button class="button" @click="closeQueryModal()">Cancel</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Notification -->
+    <notifications group="notification" class="noti"/>
+
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import CodeEditor from './components/CodeEditor.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    CodeEditor
+  },
+  data(){
+    return {
+      workspaces: [
+        {
+          name: 'Workspace One',
+          id: 1,
+          queries: [
+            {
+              name: 'Recent Orders',
+              id: 10,
+              code: `SELECT  orderID 
+        ,productID
+        ,productName
+        ,customerID 
+FROM PRODUCTS AS qs
+ORDER BY orderDtae DESC;`
+            },
+            {
+              name: 'All Orders',
+              id: 11,
+              code: `SELECT * ORDERS;`
+            }
+          ]
+        },
+        {
+          name: 'Workspace Two',
+          id: 2,
+          queries: [
+            {
+              name: 'All Orders',
+              id: 12,
+              code: `select * from tbl_access_logs tal1 where tal1.username = "nraboy" and tal1.activity_date = max(tal1.activity_date);`
+            }
+          ]
+        }
+      ],
+      menu_options:{
+        workspace_dropdown: false,
+        query_list_menu: true,
+        frequently_used_menu: false,
+        options_menu: false,
+        workspace_modal: false,
+        query_modal: false
+      },
+      selected_wokspace: 0,
+      selected_query: 0
+    }
+  },
+  methods:{
+    toggleDropdown(){
+      this.menu_options.workspace_dropdown = !this.menu_options.workspace_dropdown
+    },
+    toggleQueries(){
+      this.menu_options.query_list_menu = !this.menu_options.query_list_menu
+    },
+    toggleFrequent(){
+      this.menu_options.frequently_used_menu = !this.menu_options.frequently_used_menu
+    },
+    toggleOptions(){
+      this.menu_options.options_menu = !this.menu_options.options_menu
+    },
+    changeWorkspace(index){
+      this.selected_wokspace = index
+      this.selected_query = 0
+    },
+    changeQuery(index){
+      this.selected_query = index
+    },
+    addWorkspace(){
+      this.$notify({
+        group: 'notification',
+        type: 'success',
+        title: 'Workspace Added'
+      });
+    },
+    addQuery(){
+
+    },
+    openWorkspaceModal(){
+      this.menu_options.workspace_modal = true
+    },
+    openQueryModal(){
+      this.menu_options.query_modal = true
+    },
+    closeWorkspaceModal(){
+      this.menu_options.workspace_modal = false
+    },
+    closeQueryModal(){
+      this.menu_options.query_modal = false
+    },
+    deleteWorkspace(){
+
+    },
+    updateCode(code){
+      this.workspaces[this.selected_wokspace].queries[this.selected_query].code = code
+      this.$notify({
+        group: 'notification',
+        type: 'success',
+        title: 'Query Saved'
+      });
+    }
   }
 }
 </script>
@@ -21,8 +254,140 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+
+.dropdown{
+  margin-bottom: 10px;
+}
+
+.menu{
+  padding: 10px;
+
+  button {
+    margin: 5px;
+  }
+}
+
+.menu-list a.is-active {
+    background-color: #fff !important;
+    color: #3273dc !important;
+}
+
+.modal-card-body{
+  border-radius: 10px;
+}
+
+.cursor-point{
+  cursor: pointer;
+}
+
+/* Notification */
+.noti{
+  margin: 10px;
+}
+
+.vue-notification{
+  padding: 10px;
+}
+
+.notification-title{
+  font-size: 16px !important;
+}
+
+// Tooltip 
+.tooltip {
+  display: block !important;
+  z-index: 10000;
+  font-size: 12px;
+
+  .tooltip-inner {
+    background: black;
+    color: white;
+    border-radius: 16px;
+    padding: 5px 10px 4px;
+  }
+
+  .tooltip-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+    margin: 5px;
+    border-color: black;
+    z-index: 1;
+  }
+
+  &[x-placement^="top"] {
+    margin-bottom: 5px;
+
+    .tooltip-arrow {
+      border-width: 5px 5px 0 5px;
+      border-left-color: transparent !important;
+      border-right-color: transparent !important;
+      border-bottom-color: transparent !important;
+      bottom: -5px;
+      left: calc(50% - 5px);
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  &[x-placement^="bottom"] {
+    margin-top: 5px;
+
+    .tooltip-arrow {
+      border-width: 0 5px 5px 5px;
+      border-left-color: transparent !important;
+      border-right-color: transparent !important;
+      border-top-color: transparent !important;
+      top: -5px;
+      left: calc(50% - 5px);
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  &[x-placement^="right"] {
+    margin-left: 5px;
+
+    .tooltip-arrow {
+      border-width: 5px 5px 5px 0;
+      border-left-color: transparent !important;
+      border-top-color: transparent !important;
+      border-bottom-color: transparent !important;
+      left: -5px;
+      top: calc(50% - 5px);
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  &[x-placement^="left"] {
+    margin-right: 5px;
+
+    .tooltip-arrow {
+      border-width: 5px 0 5px 5px;
+      border-top-color: transparent !important;
+      border-right-color: transparent !important;
+      border-bottom-color: transparent !important;
+      right: -5px;
+      top: calc(50% - 5px);
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  &[aria-hidden='true'] {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s, visibility .15s;
+  }
+
+  &[aria-hidden='false'] {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .15s;
+  }
 }
 </style>
