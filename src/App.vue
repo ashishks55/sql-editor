@@ -51,7 +51,7 @@
           <i class="fas fa-minus is-pulled-right" v-if="menu_options.query_list_menu"></i>
           <i class="fas fa-plus is-pulled-right" v-else></i>
         </p>
-        <ul class="menu-list" v-show="menu_options.query_list_menu">
+        <ul class="menu-list" v-if="menu_options.query_list_menu && workspaces[selected_wokspace].queries.length">
           <li v-for="(query, index) in workspaces[selected_wokspace].queries" :key="query.id" @click="changeQuery(index)">
             <a :class="{'is-active': query.id === workspaces[selected_wokspace].queries[selected_query].id}">{{query.name}}</a>
           </li>
@@ -62,7 +62,7 @@
           <i class="fas fa-minus is-pulled-right" v-if="menu_options.frequently_used_menu"></i>
           <i class="fas fa-plus is-pulled-right" v-else></i>
         </p>
-        <ul class="menu-list" v-show="menu_options.frequently_used_menu">
+        <ul class="menu-list" v-if="menu_options.frequently_used_menu">
           <li><a>Payments</a></li>
           <li><a>Transfers</a></li>
           <li><a>Balance</a></li>
@@ -73,7 +73,7 @@
           <i class="fas fa-minus is-pulled-right" v-if="menu_options.options_menu"></i>
           <i class="fas fa-plus is-pulled-right" v-else></i>
         </p>
-        <ul class="menu-list"  v-show="menu_options.options_menu">
+        <ul class="menu-list"  v-if="menu_options.options_menu">
           <li><a><i class="fas fa-cog"></i> Settings</a></li>
           <li><a><i class="far fa-comment"></i> Report a bug</a></li>
           <li><a><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -82,8 +82,12 @@
     </div>
 
     <!-- Editor -->
-    <div class="column">
-      <code-editor :query='workspaces[selected_wokspace].queries[selected_query]' @save-code="updateCode"/>
+    <div class="column" v-if="workspaces[selected_wokspace].queries.length">
+      <code-editor :query='workspaces[selected_wokspace].queries[selected_query]' @save-code="updateCode" @delete-query="deleteQuery"/>
+    </div>
+    <!-- No query present -->
+    <div class="column empty-placeholder" v-else>
+      <p>No Query present in this workspace</p>
     </div>
 
     </div>
@@ -244,6 +248,9 @@ ORDER BY orderDtae DESC;`
         type: 'success',
         title: 'Query Saved'
       });
+    },
+    deleteQuery(){
+      this.workspaces[this.selected_wokspace].queries.splice(this.selected_query, 1);
     }
   }
 }
@@ -259,6 +266,20 @@ ORDER BY orderDtae DESC;`
 
 .dropdown{
   margin-bottom: 10px;
+}
+
+.empty-placeholder{
+  text-align: center;
+  position: relative;
+  margin: 20px 20px 0px 0px;
+  border: 1px dashed lightgrey;
+
+  p{
+    top: 50%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%,-50%);
+  }
 }
 
 .menu{

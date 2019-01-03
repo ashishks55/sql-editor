@@ -21,7 +21,7 @@
                <i class="fas fa-broom"></i>
             </span>
           </button>
-          <button class="button is-danger is-outlined" v-tooltip="{ content: 'Delete Query', placement: 'top-end'}">
+          <button class="button is-danger is-outlined" @click="deleteQuery()" v-tooltip="{ content: 'Delete Query', placement: 'top-end'}">
             <span class="icon is-small">
                <i class="fas fa-trash"></i>
             </span>
@@ -109,7 +109,7 @@ export default {
       this.editor_code = ''
     },
     deleteQuery(){
-
+      this.$emit('delete-query')
     }
   }
 }
