@@ -40,7 +40,7 @@
 
     <!-- Output -->
     <div class="output">
-      <p class="menu-label label-margin">
+      <p class="menu-label label-margin clearfix">
         OUTPUT
         <button class="button is-small is-link is-inverted is-pulled-right">Download CSV</button>
       </p>
@@ -61,6 +61,7 @@
               <th>productID</th>
               <th>productName</th>
               <th>customerID</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody>
@@ -69,30 +70,35 @@
               <td>91</td>
               <td>XYZ</td>
               <td>20</td>
+              <td>20-11-2019</td>
             </tr>
             <tr>
               <td>38</td>
               <td>9</td>
               <td>Tofu</td>
               <td>21</td>
+              <td>20-11-2019</td>
             </tr>
             <tr>
               <td>3</td>
               <td>91</td>
               <td>XYZ</td>
               <td>22</td>
+              <td>18-11-2019</td>
             </tr>
             <tr>
               <td>3</td>
               <td>91</td>
               <td>XYZ</td>
               <td>23</td>
+              <td>19-11-2019</td>
             </tr>
             <tr>
               <td>3</td>
               <td>91</td>
               <td>XYZ</td>
               <td>24</td>
+              <td>21-11-2019</td>
             </tr>
           </tbody>
         </table>
@@ -154,7 +160,7 @@ export default {
   }
 }
 .label-margin{
-  margin: 10px 0px 3px 0px;
+  margin: 10px 0px 3px 0px !important;
 }
 .actions{
   margin-bottom: 10px;
@@ -164,5 +170,10 @@ export default {
 }
 .code-editor{
   margin: 10px;
+}
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
 }
 </style>
