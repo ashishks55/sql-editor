@@ -20,7 +20,7 @@
                <i class="fas fa-folder-plus"></i>
             </span>
           </button>
-          <button class="button" v-tooltip="{ content: 'Delete Workspace', placement: 'bottom-end'}">
+          <button class="button" v-if="workspaces[selected_wokspace].name !== 'Default'" @click="deleteWorkspace()" v-tooltip="{ content: 'Delete Workspace', placement: 'bottom-end'}">
             <span class="icon is-small">
                <i class="fas fa-trash"></i>
             </span>
@@ -46,6 +46,7 @@
           </div>
         </div>
 
+        <!-- Query List -->
         <p class="menu-label cursor-point" @click="toggleQueries()">
           Query List
           <i class="fas fa-minus is-pulled-right" v-if="menu_options.query_list_menu"></i>
@@ -57,17 +58,20 @@
           </li>
         </ul>
         <hr>
+
+        <!-- Frequent Queries -->
         <p class="menu-label cursor-point" @click="toggleFrequent()">
           Frequently Used
           <i class="fas fa-minus is-pulled-right" v-if="menu_options.frequently_used_menu"></i>
           <i class="fas fa-plus is-pulled-right" v-else></i>
         </p>
         <ul class="menu-list" v-if="menu_options.frequently_used_menu">
-          <li><a>Payments</a></li>
-          <li><a>Transfers</a></li>
-          <li><a>Balance</a></li>
+          <li><a>All Orders</a></li>
+          <li><a>Recent Orders</a></li>
         </ul>
         <hr>
+
+        <!-- Options list -->
        <p class="menu-label cursor-point" @click="toggleOptions()">
           Options
           <i class="fas fa-minus is-pulled-right" v-if="menu_options.options_menu"></i>
@@ -87,7 +91,15 @@
     </div>
     <!-- No query present -->
     <div class="column empty-placeholder" v-else>
-      <p>No Query present in this workspace</p>
+      <div>
+        <p>No Query present in this workspace</p>
+        <button class="button is-inverted is-success" @click="openQueryModal()">
+          <span class="icon">
+            <i class="fas fa-plus"></i>
+          </span>
+          <span>Add Query</span>
+        </button>
+      </div>
     </div>
 
     </div>
@@ -99,14 +111,14 @@
         <section class="modal-card-body">
           <div class="field">
             <p class="control has-icons-left">
-              <input class="input" type="text" placeholder="Name">
+              <input v-model="new_workspace_name" class="input" type="text" placeholder="Name" required>
               <span class="icon is-small is-left">
                 <i class="fas fa-pen"></i>
               </span>
             </p>
           </div>
           <div class="buttons">
-            <button class="button is-success">Add Workspace</button>
+            <button class="button is-success" @click="addWorkspace()">Add Workspace</button>
             <button class="button" @click="closeWorkspaceModal()">Cancel</button>
           </div>
         </section>
@@ -120,14 +132,14 @@
         <section class="modal-card-body">
           <div class="field">
             <p class="control has-icons-left">
-              <input class="input" type="text" placeholder="Name">
+              <input v-model="new_query_name" class="input" type="text" placeholder="Name" required>
               <span class="icon is-small is-left">
                 <i class="fas fa-pen"></i>
               </span>
             </p>
           </div>
           <div class="buttons">
-            <button class="button is-success">Add Query</button>
+            <button class="button is-success" @click="addQuery()">Add Query</button>
             <button class="button" @click="closeQueryModal()">Cancel</button>
           </div>
         </section>
@@ -152,12 +164,12 @@ export default {
     return {
       workspaces: [
         {
-          name: 'Workspace One',
+          name: 'Default',
           id: 1,
           queries: [
             {
               name: 'Recent Orders',
-              id: 10,
+              id: 1,
               code: `SELECT  orderID 
         ,productID
         ,productName
@@ -167,8 +179,18 @@ ORDER BY orderDtae DESC;`
             },
             {
               name: 'All Orders',
-              id: 11,
+              id: 2,
               code: `SELECT * ORDERS;`
+            },
+            {
+              name: 'Get by Products',
+              id: 3,
+              code: `SELECT  orderID 
+        ,productID
+        ,productName
+        ,customerID 
+FROM PRODUCTS AS qs
+ORDER BY productID ASEC;`
             }
           ]
         },
@@ -178,7 +200,7 @@ ORDER BY orderDtae DESC;`
           queries: [
             {
               name: 'All Orders',
-              id: 12,
+              id: 1,
               code: `select * from tbl_access_logs tal1 where tal1.username = "nraboy" and tal1.activity_date = max(tal1.activity_date);`
             }
           ]
@@ -192,6 +214,8 @@ ORDER BY orderDtae DESC;`
         workspace_modal: false,
         query_modal: false
       },
+      new_workspace_name: '',
+      new_query_name: '',
       selected_wokspace: 0,
       selected_query: 0
     }
@@ -217,14 +241,45 @@ ORDER BY orderDtae DESC;`
       this.selected_query = index
     },
     addWorkspace(){
-      this.$notify({
-        group: 'notification',
-        type: 'success',
-        title: 'Workspace Added'
-      });
+      if(this.new_workspace_name !== ''){
+        let id = this.workspaces[this.workspaces.length - 1].id
+        this.workspaces.push({name: this.new_workspace_name, id: ++id, queries: []})
+        this.new_workspace_name = ''
+        this.closeWorkspaceModal()
+        this.$notify({
+          group: 'notification',
+          type: 'success',
+          title: 'Workspace Added'
+        });
+      }
+      else{
+        this.$notify({
+          group: 'notification',
+          type: 'warn',
+          title: 'Name cannot be empty!'
+        });
+      }
+      
     },
     addQuery(){
-
+      if(this.new_query_name !== ''){
+        let id = this.workspaces[this.selected_wokspace].queries.length + 1
+        this.workspaces[this.selected_wokspace].queries.push({name: this.new_query_name, id: id, code: ''})
+        this.new_query_name = ''
+        this.closeQueryModal()
+        this.$notify({
+          group: 'notification',
+          type: 'success',
+          title: 'Query Added'
+        });
+      }
+      else{
+        this.$notify({
+          group: 'notification',
+          type: 'warn',
+          title: 'Name cannot be empty!'
+        });
+      }
     },
     openWorkspaceModal(){
       this.menu_options.workspace_modal = true
@@ -239,7 +294,13 @@ ORDER BY orderDtae DESC;`
       this.menu_options.query_modal = false
     },
     deleteWorkspace(){
-
+      this.workspaces.splice(this.selected_wokspace,1)
+      this.selected_wokspace = 0
+      this.selected_query = 0
+    },
+    deleteQuery(){
+      this.workspaces[this.selected_wokspace].queries.splice(this.selected_query, 1)
+      this.selected_query = 0
     },
     updateCode(code){
       this.workspaces[this.selected_wokspace].queries[this.selected_query].code = code
@@ -248,10 +309,8 @@ ORDER BY orderDtae DESC;`
         type: 'success',
         title: 'Query Saved'
       });
-    },
-    deleteQuery(){
-      this.workspaces[this.selected_wokspace].queries.splice(this.selected_query, 1);
     }
+    
   }
 }
 </script>
@@ -271,10 +330,10 @@ ORDER BY orderDtae DESC;`
 .empty-placeholder{
   text-align: center;
   position: relative;
-  margin: 20px 20px 0px 0px;
+  margin: 50px 20px 0px 0px;
   border: 1px dashed lightgrey;
 
-  p{
+  div{
     top: 50%;
     position: absolute;
     left: 50%;

@@ -4,6 +4,7 @@
       <p class="menu-label label-margin">
           SQL Editor 
       </p>
+      <!-- Action buttons -->
       <div class="actions">
         <div class="buttons">
           <button class="button is-primary is-outlined" @click="saveCode()" v-tooltip="{ content: 'Save Query', placement: 'top-end'}">
@@ -11,7 +12,7 @@
                <i class="fas fa-save"></i>
             </span>
           </button>
-          <button class="button is-success is-outlined" v-tooltip="{ content: 'Run Query', placement: 'top-end'}">
+          <button class="button is-success is-outlined" @click="runCode()" v-tooltip="{ content: 'Run Query', placement: 'top-end'}">
             <span class="icon is-small">
                <i class="fas fa-play"></i>
             </span>
@@ -37,12 +38,22 @@
     theme="vs-dark">
     </monaco-editor>
 
+    <!-- Output -->
     <div class="output">
       <p class="menu-label label-margin">
         OUTPUT
         <button class="button is-small is-link is-inverted is-pulled-right">Download CSV</button>
       </p>
-      <div class="responsive-table">
+      <div class="column has-text-centered" v-if="!query_executed">
+        <p>Run query to view output</p>
+        <button class="button is-inverted is-success" @click="runCode()">
+          <span class="icon">
+            <i class="fas fa-play"></i>
+          </span>
+          <span>Run Query</span>
+        </button>
+      </div>
+      <div class="responsive-table" v-else>
         <table class="table is-striped is-fullwidth is-bordered">
           <thead>
             <tr>
@@ -54,16 +65,34 @@
           </thead>
           <tbody>
             <tr>
-              <td>38</td>
-              <td>9</td>
-              <td>Tofu</td>
-              <td>22</td>
+              <td>3</td>
+              <td>91</td>
+              <td>XYZ</td>
+              <td>20</td>
             </tr>
             <tr>
               <td>38</td>
               <td>9</td>
               <td>Tofu</td>
+              <td>21</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>91</td>
+              <td>XYZ</td>
               <td>22</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>91</td>
+              <td>XYZ</td>
+              <td>23</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>91</td>
+              <td>XYZ</td>
+              <td>24</td>
             </tr>
           </tbody>
         </table>
@@ -85,14 +114,13 @@ export default {
   watch: { 
     query: function(newVal) {
       this.editor_code = newVal.code
+      this.query_executed = false
     }
   },
   data() {
     return {
-      table_data: {
-
-      },
       editor_code: '',
+      query_executed: false
     }
   },
   created(){
@@ -103,7 +131,7 @@ export default {
       this.$emit('save-code', this.editor_code)
     },
     runCode(){
-
+      this.query_executed = true
     },
     clearCode(){
       this.editor_code = ''
