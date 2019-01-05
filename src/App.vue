@@ -330,8 +330,9 @@ ORDER BY productID ASEC;`
 .empty-placeholder{
   text-align: center;
   position: relative;
-  margin: 50px 20px 0px 0px;
+  margin: 50px 20px 0px 30px;
   border: 1px dashed lightgrey;
+  height: 400px;
 
   div{
     top: 50%;
