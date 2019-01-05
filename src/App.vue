@@ -109,18 +109,20 @@
       <div class="modal-background"></div>
       <div class="modal-card">
         <section class="modal-card-body">
-          <div class="field">
-            <p class="control has-icons-left">
-              <input v-model="new_workspace_name" class="input" type="text" placeholder="Name" required>
-              <span class="icon is-small is-left">
-                <i class="fas fa-pen"></i>
-              </span>
-            </p>
-          </div>
-          <div class="buttons">
-            <button class="button is-success" @click="addWorkspace()">Add Workspace</button>
-            <button class="button" @click="closeWorkspaceModal()">Cancel</button>
-          </div>
+          <form @submit.prevent="addWorkspace()">
+            <div class="field">
+              <p class="control has-icons-left">
+                <input v-model="new_workspace_name" class="input" type="text" placeholder="Name" ref="workspace" required>
+                <span class="icon is-small is-left">
+                  <i class="fas fa-pen"></i>
+                </span>
+              </p>
+            </div>
+            <div class="buttons">
+              <button class="button is-success" type="submit">Add Workspace</button>
+              <button class="button" @click="closeWorkspaceModal()">Cancel</button>
+            </div>
+          </form>
         </section>
       </div>
     </div>
@@ -130,18 +132,20 @@
       <div class="modal-background"></div>
       <div class="modal-card">
         <section class="modal-card-body">
-          <div class="field">
-            <p class="control has-icons-left">
-              <input v-model="new_query_name" class="input" type="text" placeholder="Name" required>
-              <span class="icon is-small is-left">
-                <i class="fas fa-pen"></i>
-              </span>
-            </p>
-          </div>
-          <div class="buttons">
-            <button class="button is-success" @click="addQuery()">Add Query</button>
-            <button class="button" @click="closeQueryModal()">Cancel</button>
-          </div>
+          <form @submit.prevent="addQuery()">
+            <div class="field">
+              <p class="control has-icons-left">
+                <input v-model="new_query_name" class="input" type="text" placeholder="Name" ref="query" required>
+                <span class="icon is-small is-left">
+                  <i class="fas fa-pen"></i>
+                </span>
+              </p>
+            </div>
+            <div class="buttons">
+              <button class="button is-success" type="submit">Add Query</button>
+              <button class="button" @click="closeQueryModal()">Cancel</button>
+            </div>
+          </form>
         </section>
       </div>
     </div>
