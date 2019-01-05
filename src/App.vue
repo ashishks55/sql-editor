@@ -263,8 +263,12 @@ ORDER BY productID ASEC;`
     },
     addQuery(){
       if(this.new_query_name !== ''){
-        let id = this.workspaces[this.selected_wokspace].queries.length + 1
-        this.workspaces[this.selected_wokspace].queries.push({name: this.new_query_name, id: id, code: ''})
+        let queries = this.workspaces[this.selected_wokspace].queries
+        let id = 0
+        if(queries.length !== 0){
+          id = queries[queries.length - 1].id 
+        }
+        this.workspaces[this.selected_wokspace].queries.push({name: this.new_query_name, id: ++id, code: ''})
         this.new_query_name = ''
         this.closeQueryModal()
         this.$notify({
