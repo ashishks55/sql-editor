@@ -7,22 +7,22 @@
       <!-- Action buttons -->
       <div class="actions">
         <div class="buttons">
-          <button class="button is-primary is-outlined" @click="saveCode()" v-tooltip="{ content: 'Save Query', placement: 'top-end'}">
+          <button class="save-query-btn button is-primary is-outlined" @click="saveCode()" v-tooltip="{ content: 'Save Query', placement: 'top-end'}">
             <span class="icon is-small">
                <i class="fas fa-save"></i>
             </span>
           </button>
-          <button class="button is-success is-outlined" @click="runCode()" v-tooltip="{ content: 'Run Query', placement: 'top-end'}">
+          <button class="run-query-btn button is-success is-outlined" @click="runCode()" v-tooltip="{ content: 'Run Query', placement: 'top-end'}">
             <span class="icon is-small">
                <i class="fas fa-play"></i>
             </span>
           </button>
-          <button class="button is-link is-outlined" @click="clearCode()" v-tooltip="{ content: 'Clear Code', placement: 'top-end'}">
+          <button class="clear-code-btn button is-link is-outlined" @click="clearCode()" v-tooltip="{ content: 'Clear Code', placement: 'top-end'}">
             <span class="icon is-small">
                <i class="fas fa-broom"></i>
             </span>
           </button>
-          <button class="button is-danger is-outlined" @click="deleteQuery()" v-tooltip="{ content: 'Delete Query', placement: 'top-end'}">
+          <button class="delete-query-btn button is-danger is-outlined" @click="deleteQuery()" v-tooltip="{ content: 'Delete Query', placement: 'top-end'}">
             <span class="icon is-small">
                <i class="fas fa-trash"></i>
             </span>
@@ -46,14 +46,14 @@
       </p>
       <div class="column has-text-centered" v-if="!query_executed">
         <p>Run query to view output</p>
-        <button class="button is-inverted is-success" @click="runCode()">
+        <button class="run-query-btn button is-inverted is-success" @click="runCode()">
           <span class="icon">
             <i class="fas fa-play"></i>
           </span>
           <span>Run Query</span>
         </button>
       </div>
-      <div class="responsive-table" v-else>
+      <div class="query-output responsive-table" v-else>
         <table class="table is-striped is-fullwidth is-bordered">
           <thead>
             <tr>
